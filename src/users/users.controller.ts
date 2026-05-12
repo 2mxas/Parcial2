@@ -1,31 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreatePostDto } from 'src/posts/dto/create-post.dto';
+import { ApiKeyGuard } from 'src/auth/api-key.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @UseGuards(ApiKeyGuard)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
+  @UseGuards(ApiKeyGuard)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Post(':id/posts')
-  createPost(@Param('id') id: string, @Body() createPostDto: any) {
-    // Logic to create a post for the user with the given id
-    return `This action adds a new post for user #${id}`;
+  @UseGuards(ApiKeyGuard)
+  createPost(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    return this.usersService.createPost(id, createPostDto);
   }
 
   @Get(':id/posts')
-  findPosts(@Param('id') id: string) {
-    // Logic to find all posts for the user with the given id
-    return `This action returns all posts for user #${id}`;
+  @UseGuards(ApiKeyGuard)
+  findPosts(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findPosts(id);
   }
 }

@@ -8,6 +8,6 @@ export class PostsController {
 
   @Post(':id/comments')
   createComment(@Param('id') id: string, @Body() createCommentDto: CreateCommentDto) {
-    return this.postsService.createComment(createCommentDto);
+    return this.postsService.createComment(id, createCommentDto);
   }
 }
